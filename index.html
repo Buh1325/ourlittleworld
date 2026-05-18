@@ -410,6 +410,30 @@
 
 <script>
 // ============================================================
+// SUPABASE SETUP - MUST LOAD FIRST
+// ============================================================
+const SUPABASE_URL = 'https://xqctwfbhjxrohiajoakg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5Uhgb5dMI9y_ubW5zo2U3A_66x2KfyN';
+let supabase;
+
+// Wait for Supabase library to load
+function initSupabase() {
+  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Supabase connected!');
+    // Load data after connection
+    loadLettersFromSupabase();
+    loadCalendarFromSupabase();
+  } else {
+    console.log('⏳ Waiting for Supabase...');
+    setTimeout(initSupabase, 500);
+  }
+}
+
+// Start when page loads
+window.addEventListener('DOMContentLoaded', initSupabase);
+
+// ============================================================
 // MUSIC PLAYER
 // ============================================================
 const audio = document.getElementById('audioPlayer');
@@ -477,7 +501,7 @@ function spawnHeart(h) {
 for (let i = 0; i < NUM_HEARTS; i++) {
   const h = {};
   spawnHeart(h);
-  h.y = randomBetween(-canvas.height, canvas.height); // stagger start
+  h.y = randomBetween(-canvas.height, canvas.height);
   hearts.push(h);
 }
 
@@ -550,131 +574,205 @@ function showFloatScore(x, y) {
   setTimeout(() => el.remove(), 800);
 }
 
-// float up keyframe injected once
 const styleEl = document.createElement('style');
 styleEl.textContent = '@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}';
 document.head.appendChild(styleEl);
 
 // ============================================================
-// CALENDAR
+// CALENDAR WITH SUPABASE
 // ============================================================
-function getCalKey(year, month, day) {
-  return `cal_${year}_${month}_${day}`;
-}
+let currentFedDays = {};
 
-function buildCalendar() {
+async function loadCalendarFromSupabase() {
+  if (!supabase) return;
+  
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  const today = now.getDate();
+  
+  // Get first day of month and days in month
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
+  
+  // Fetch all fed days for this month from Supabase
+  const startDate = `${year}-${String(month+1).padStart(2,'0')}-01`;
+  const endDate = `${year}-${String(month+1).padStart(2,'0')}-${daysInMonth}`;
+  
+  const { data, error } = await supabase
+    .from('calendar')
+    .select('date, fed')
+    .gte('date', startDate)
+    .lte('date', endDate);
+  
+  if (error) {
+    console.error('Calendar load error:', error);
+    return;
+  }
+  
+  // Store fed status
+  currentFedDays = {};
+  data?.forEach(item => {
+    if (item.fed) currentFedDays[item.date] = true;
+  });
+  
+  renderCalendar(year, month, firstDay, daysInMonth);
+}
 
+async function toggleDaySupabase(dateStr, year, month, d) {
+  if (!supabase) return;
+  
+  const currentlyFed = currentFedDays[dateStr] || false;
+  const newFed = !currentlyFed;
+  
+  const { error } = await supabase
+    .from('calendar')
+    .upsert({ date: dateStr, fed: newFed }, { onConflict: 'date' });
+  
+  if (error) {
+    console.error('Toggle error:', error);
+    alert('Failed to save: ' + error.message);
+    return;
+  }
+  
+  // Update local cache
+  if (newFed) {
+    currentFedDays[dateStr] = true;
+  } else {
+    delete currentFedDays[dateStr];
+  }
+  
+  // Re-render calendar
+  const now = new Date();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  renderCalendar(year, month, firstDay, daysInMonth);
+  waveMascot();
+  
+  // Check if all days are fed
+  const fedCount = Object.keys(currentFedDays).length;
+  if (fedCount === daysInMonth) launchConfetti();
+}
+
+function renderCalendar(year, month, firstDay, daysInMonth) {
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
   const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   dayNames.forEach(d => {
     const h = document.createElement('div');
     h.className = 'cal-header'; h.textContent = d;
     grid.appendChild(h);
   });
-
-  // empty cells before first day
+  
+  // Empty cells before first day
   for (let i = 0; i < firstDay; i++) {
     const cell = document.createElement('div');
     cell.className = 'cal-day empty-cell';
     grid.appendChild(cell);
   }
-
+  
   let fedCount = 0;
+  const today = new Date().getDate();
+  const todayYear = new Date().getFullYear();
+  const todayMonth = new Date().getMonth();
+  
   for (let d = 1; d <= daysInMonth; d++) {
-    const key = getCalKey(year, month, d);
-    const fed = localStorage.getItem(key) === '1';
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const fed = currentFedDays[dateStr] || false;
     if (fed) fedCount++;
-
+    
+    const isToday = (year === todayYear && month === todayMonth && d === today);
+    
     const cell = document.createElement('div');
-    cell.className = 'cal-day' + (fed ? ' fed' : '') + (d === today ? ' today' : '');
+    cell.className = 'cal-day' + (fed ? ' fed' : '') + (isToday ? ' today' : '');
     cell.innerHTML = `<span class="day-num">${d}</span><span class="heart-icon">${fed ? '💖' : '🤍'}</span>`;
-    cell.addEventListener('click', () => toggleDay(year, month, d, daysInMonth));
+    cell.addEventListener('click', () => toggleDaySupabase(dateStr, year, month, d));
     grid.appendChild(cell);
   }
-
+  
   document.getElementById('fedCount').textContent = fedCount;
-  checkAllFed(fedCount, daysInMonth);
 }
 
-function toggleDay(year, month, d, total) {
-  const key = getCalKey(year, month, d);
-  const current = localStorage.getItem(key) === '1';
-  localStorage.setItem(key, current ? '0' : '1');
-  buildCalendar();
+// ============================================================
+// LETTER WALL WITH SUPABASE
+// ============================================================
+async function postLetter() {
+  const input = document.getElementById('letterInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!supabase) {
+    alert('Still connecting to database... try again in a moment');
+    return;
+  }
+  
+  const { error } = await supabase
+    .from('letters')
+    .insert([{ message: text, author: 'Anonymous' }]);
+  
+  if (error) {
+    console.error('Post error:', error);
+    alert('Failed to post: ' + error.message);
+    return;
+  }
+  
+  input.value = '';
+  updateCharCount();
+  loadLettersFromSupabase();
   waveMascot();
+  launchConfetti(); // celebrate the post!
 }
 
-function checkAllFed(fed, total) {
-  if (fed === total) launchConfetti();
+async function loadLettersFromSupabase() {
+  if (!supabase) return;
+  
+  const { data, error } = await supabase
+    .from('letters')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  
+  if (error) {
+    console.error('Load letters error:', error);
+    return;
+  }
+  
+  const list = document.getElementById('lettersList');
+  if (!list) return;
+  list.innerHTML = '';
+  
+  data?.forEach(letter => {
+    const card = document.createElement('div');
+    card.className = 'letter-card';
+    const date = letter.created_at ? new Date(letter.created_at).toLocaleDateString() : 'recent';
+    const time = letter.created_at ? new Date(letter.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    card.innerHTML = `<div class="letter-meta">📅 ${date} · ⏰ ${time}</div><div class="letter-text">${escapeHtml(letter.message)}</div>`;
+    list.appendChild(card);
+  });
 }
 
-buildCalendar();
-
-// ============================================================
-// LETTER WALL
-// ============================================================
 function updateCharCount() {
   const v = document.getElementById('letterInput').value.length;
   document.getElementById('charCount').textContent = v + ' / 200';
 }
 
-function postLetter() {
-  const input = document.getElementById('letterInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const letters = JSON.parse(localStorage.getItem('letters') || '[]');
-  const now = new Date();
-  letters.unshift({
-    text,
-    date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-  });
-  localStorage.setItem('letters', JSON.stringify(letters));
-  input.value = '';
-  updateCharCount();
-  renderLetters();
-  waveMascot();
-}
-
-function renderLetters() {
-  const letters = JSON.parse(localStorage.getItem('letters') || '[]');
-  const list = document.getElementById('lettersList');
-  list.innerHTML = '';
-  letters.forEach(l => {
-    const card = document.createElement('div');
-    card.className = 'letter-card';
-    card.innerHTML = `<div class="letter-meta">📅 ${l.date} · ⏰ ${l.time}</div><div class="letter-text">${escapeHtml(l.text)}</div>`;
-    list.appendChild(card);
-  });
-}
-
 function escapeHtml(s) {
+  if (!s) return '';
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-renderLetters();
-
 // ============================================================
-// MASCOT
+// MASCOT & CONFETTI
 // ============================================================
 function waveMascot() {
   const m = document.getElementById('mascot');
+  if (!m) return;
   m.classList.remove('wave');
   void m.offsetWidth;
   m.classList.add('wave');
   setTimeout(() => m.classList.remove('wave'), 600);
 }
 
-// ============================================================
-// CONFETTI
-// ============================================================
 function launchConfetti() {
   const colors = ['#f9c5c5','#fdd9b5','#c8f0e0','#e8d5f5','#d0eeff','#f97070','#a8e6cf'];
   for (let i = 0; i < 80; i++) {
@@ -696,11 +794,13 @@ function launchConfetti() {
   }
 }
 
-  // Your actual Supabase configuration
-const SUPABASE_URL = 'https://xqctwfbhjxrohiajoakg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_5Uhgb5dMI9y_ubW5zo2U3A_66x2KfyN';  // Paste your full key here
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  
+// Initial load of letter count display
+function updateCharCount() {
+  const v = document.getElementById('letterInput')?.value.length || 0;
+  const counter = document.getElementById('charCount');
+  if (counter) counter.textContent = v + ' / 200';
+}
+
 </script>
 </body>
 </html>
