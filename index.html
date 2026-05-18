@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>✨ Our Little World ✨</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -336,6 +335,7 @@
     nav a { font-size: 0.95rem; padding: 4px 12px; }
   }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -695,6 +695,12 @@ function launchConfetti() {
     }, i * 20);
   }
 }
+
+  // Your actual Supabase configuration
+const SUPABASE_URL = 'https://xqctwfbhjxrohiajoakg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5Uhgb5dMI9y_ubW5zo2U3A_66x2KfyN';  // Paste your full key here
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
 </script>
 </body>
 </html>
