@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ Our Little World ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fff8f0;
+    --blush: #fde8e8;
+    --rose: #f9c5c5;
+    --peach: #fdd9b5;
+    --mint: #c8f0e0;
+    --lavender: #e8d5f5;
+    --sky: #d0eeff;
+    --text: #6b4f6b;
+    --soft: #b89ab8;
+    --accent: #e87070;
+    --shadow: rgba(180,120,140,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    background-image:
+      radial-gradient(circle at 20% 10%, #fde8e820 0%, transparent 40%),
+      radial-gradient(circle at 80% 50%, #e8d5f520 0%, transparent 40%),
+      radial-gradient(circle at 40% 90%, #c8f0e020 0%, transparent 40%);
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- DECORATIVE DOTS ---- */
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(circle, #e0b0b030 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,248,240,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px dashed var(--rose);
+    padding: 10px 20px;
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+  }
+
+  nav a {
+    font-family: 'Caveat', cursive; font-size: 1.1rem; font-weight: 600;
+    color: var(--text); text-decoration: none;
+    padding: 5px 16px; border-radius: 20px;
+    background: var(--blush);
+    border: 2px solid var(--rose);
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0 var(--rose);
+  }
+  nav a:hover { transform: translateY(-2px); background: var(--rose); box-shadow: 3px 4px 0 var(--accent); }
+
+  /* ---- HERO ---- */
+  .hero {
+    text-align: center; padding: 50px 20px 30px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'Caveat', cursive; font-size: clamp(2.8rem, 7vw, 5rem);
+    color: var(--accent);
+    text-shadow: 3px 3px 0 #f9c5c5, 5px 5px 0 #fde8e8;
+    letter-spacing: 2px;
+  }
+  .hero p {
+    font-family: 'Caveat', cursive; font-size: 1.4rem;
+    color: var(--soft); margin-top: 8px;
+  }
+  .hero .decos { font-size: 2rem; letter-spacing: 8px; margin-top: 10px; animation: floatY 3s ease-in-out infinite; }
+
+  @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  /* ---- MASCOT ---- */
+  .mascot {
+    position: fixed; bottom: 20px; right: 20px; z-index: 200;
+    font-size: 2.8rem; cursor: default;
+    animation: bounce 2s ease-in-out infinite;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+    transition: transform 0.1s;
+    user-select: none;
+  }
+  .mascot.wave { animation: waveAnim 0.6s ease; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes waveAnim {
+    0%{transform:rotate(0) scale(1)}
+    25%{transform:rotate(-20deg) scale(1.3)}
+    50%{transform:rotate(20deg) scale(1.3)}
+    75%{transform:rotate(-10deg) scale(1.2)}
+    100%{transform:rotate(0) scale(1)}
+  }
+
+  /* ---- SECTIONS ---- */
+  section {
+    max-width: 780px; margin: 30px auto; padding: 30px 24px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 28px;
+    box-shadow: 0 6px 30px var(--shadow), 0 1px 0 #fff inset;
+    border: 2px solid rgba(255,255,255,0.8);
+    position: relative; z-index: 1;
+  }
+
+  .section-title {
+    font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700;
+    color: var(--accent); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 2px;
+    background: linear-gradient(to right, var(--rose), transparent);
+    border-radius: 2px; margin-left: 8px;
+  }
+
+  /* ---- MUSIC PLAYER ---- */
+  #music { background: linear-gradient(135deg, #fff0f5 0%, #fff8f0 100%); }
+
+  .player-card {
+    background: linear-gradient(135deg, var(--blush), var(--peach));
+    border-radius: 20px; padding: 22px;
+    box-shadow: 0 4px 18px rgba(230,130,130,0.2);
+    border: 2px solid var(--rose);
+  }
+
+  .track-name {
+    font-family: 'Caveat', cursive; font-size: 1.5rem;
+    color: var(--text); text-align: center; margin-bottom: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .player-controls { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+  .btn-play {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--accent); border: none; cursor: pointer;
+    font-size: 1.5rem; color: white;
+    box-shadow: 0 4px 12px rgba(230,100,100,0.4);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-play:hover { transform: scale(1.1); box-shadow: 0 6px 18px rgba(230,100,100,0.5); }
+
+  .volume-wrap { display: flex; align-items: center; gap: 8px; }
+  .volume-wrap span { font-size: 1.2rem; }
+
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px;
+    background: var(--rose); outline: none; cursor: pointer;
+    width: 100px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--accent);
+    box-shadow: 0 2px 6px rgba(230,100,100,0.4);
+    cursor: pointer;
+  }
+
+  .upload-wrap { margin-top: 14px; text-align: center; }
+  .btn-upload {
+    font-family: 'Caveat', cursive; font-size: 1rem; padding: 8px 20px;
+    border-radius: 20px; border: 2px dashed var(--accent);
+    background: transparent; color: var(--accent); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-upload:hover { background: var(--blush); }
+  #fileInput { display: none; }
+
+  /* ---- GAME ---- */
+  #game { background: linear-gradient(135deg, #f0f8ff 0%, #fff5f8 100%); }
+
+  .game-score {
+    font-family: 'Caveat', cursive; font-size: 1.6rem;
+    text-align: center; margin-bottom: 12px;
+    color: var(--text);
+  }
+  .game-score span { color: var(--accent); font-size: 2rem; }
+
+  #gameCanvas {
+    display: block; margin: 0 auto;
+    border-radius: 20px;
+    border: 3px solid var(--rose);
+    background: linear-gradient(180deg, #fff0fb 0%, #fff8f0 100%);
+    cursor: crosshair;
+    box-shadow: 0 4px 20px var(--shadow);
+    max-width: 100%;
+  }
+
+  .game-hint {
+    text-align: center; font-family: 'Caveat', cursive;
+    font-size: 1.1rem; color: var(--soft); margin-top: 10px;
+  }
+
+  /* ---- CALENDAR ---- */
+  #calendar { background: linear-gradient(135deg, #f5fff8 0%, #fff0ff 100%); }
+
+  .cal-summary {
+    font-family: 'Caveat', cursive; font-size: 1.3rem;
+    text-align: center; margin-bottom: 18px; color: var(--soft);
+  }
+  .cal-summary b { color: var(--accent); font-size: 1.5rem; }
+
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .cal-header {
+    font-family: 'Caveat', cursive; font-size: 1rem; font-weight: 700;
+    text-align: center; color: var(--soft); padding: 4px 0;
+  }
+
+  .cal-day {
+    background: white; border-radius: 12px;
+    border: 2px solid var(--rose);
+    padding: 6px 4px; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 2px 2px 0 var(--blush);
+    min-height: 52px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  }
+  .cal-day:hover { transform: translateY(-2px); box-shadow: 3px 4px 0 var(--rose); }
+  .cal-day.fed { background: linear-gradient(135deg, var(--blush), var(--peach)); border-color: var(--accent); }
+  .cal-day.today { border-color: var(--accent); border-width: 2.5px; }
+  .cal-day .day-num { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--text); }
+  .cal-day .heart-icon { font-size: 1.2rem; transition: transform 0.2s; }
+  .cal-day.fed .heart-icon { transform: scale(1.2); }
+  .cal-day.empty-cell { background: transparent; border: none; box-shadow: none; cursor: default; }
+
+  /* ---- LETTER WALL ---- */
+  #letters { background: linear-gradient(135deg, #fffaf0 0%, #f5f0ff 100%); }
+
+  .letter-input-wrap {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
+  }
+
+  textarea {
+    font-family: 'Caveat', cursive; font-size: 1.2rem;
+    padding: 14px 16px; border-radius: 16px;
+    border: 2px solid var(--rose);
+    background: rgba(255,255,255,0.8);
+    color: var(--text); resize: none; outline: none;
+    transition: border-color 0.2s;
+    box-shadow: inset 0 2px 8px rgba(200,150,150,0.1);
+  }
+  textarea:focus { border-color: var(--accent); }
+
+  .letter-footer { display: flex; justify-content: space-between; align-items: center; }
+  .char-count { font-size: 0.85rem; color: var(--soft); }
+
+  .btn-post {
+    font-family: 'Caveat', cursive; font-size: 1.2rem; font-weight: 700;
+    padding: 10px 24px; border-radius: 24px;
+    background: linear-gradient(135deg, var(--rose), var(--peach));
+    border: 2px solid var(--accent); color: var(--text);
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 3px 3px 0 var(--rose);
+  }
+  .btn-post:hover { transform: translateY(-2px); box-shadow: 4px 5px 0 var(--accent); }
+  .btn-post:active { transform: translateY(0); box-shadow: 1px 1px 0 var(--accent); }
+
+  .letters-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .letter-card {
+    background: white;
+    border-radius: 18px 18px 18px 4px;
+    padding: 14px 18px;
+    border: 2px solid var(--lavender);
+    box-shadow: 3px 3px 0 var(--lavender);
+    position: relative;
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .letter-card::before {
+    content: '';
+    position: absolute; bottom: -10px; left: 10px;
+    border: 10px solid transparent;
+    border-top-color: var(--lavender);
+    border-bottom: 0; border-left: 0;
+  }
+  .letter-card::after {
+    content: '';
+    position: absolute; bottom: -7px; left: 11px;
+    border: 9px solid transparent;
+    border-top-color: white;
+    border-bottom: 0; border-left: 0;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .letter-meta { font-size: 0.8rem; color: var(--soft); margin-bottom: 6px; }
+  .letter-text { font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--text); line-height: 1.4; }
+
+  /* ---- CONFETTI ---- */
+  .confetti-piece {
+    position: fixed; top: -10px;
+    width: 10px; height: 10px; border-radius: 50%;
+    pointer-events: none; z-index: 999;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    text-align: center; padding: 30px 20px;
+    font-family: 'Caveat', cursive; font-size: 1.2rem; color: var(--soft);
+    position: relative; z-index: 1;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 520px) {
+    section { padding: 20px 14px; margin: 16px 10px; }
+    .cal-grid { gap: 4px; }
+    .cal-day { min-height: 44px; padding: 4px 2px; }
+    .cal-day .day-num { font-size: 0.85rem; }
+    .cal-day .heart-icon { font-size: 1rem; }
+    nav a { font-size: 0.95rem; padding: 4px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASCOT -->
+<div class="mascot" id="mascot">🐻</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#music">🎵 Music</a>
+  <a href="#game">💖 Game</a>
+  <a href="#calendar">📅 Calendar</a>
+  <a href="#letters">💌 Letters</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>✨ Our Little World ✨</h1>
+  <p>a cozy corner for us 🌸</p>
+  <div class="decos">🌷 ⭐ 💫 🌸 ⭐</div>
+</div>
+
+<!-- MUSIC PLAYER -->
+<section id="music">
+  <div class="section-title">🎵 Music Player</div>
+  <div class="player-card">
+    <div class="track-name" id="trackName">🎶 SoundHelix Song 1</div>
+    <audio id="audioPlayer" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <div class="player-controls">
+      <button class="btn-play" id="playBtn" onclick="togglePlay()">▶</button>
+      <div class="volume-wrap">
+        <span>🔈</span>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)">
+        <span>🔊</span>
+      </div>
+    </div>
+    <div class="upload-wrap">
+      <button class="btn-upload" onclick="document.getElementById('fileInput').click()">📁 Upload your own song</button>
+      <input type="file" id="fileInput" accept="audio/*" onchange="loadLocalFile(this)">
+    </div>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game">
+  <div class="section-title">💖 Click the Hearts!</div>
+  <div class="game-score">Score: <span id="scoreDisplay">0</span> 💕</div>
+  <canvas id="gameCanvas" width="700" height="360"></canvas>
+  <p class="game-hint">✨ Click the floating hearts to earn points! ✨</p>
+</section>
+
+<!-- CALENDAR -->
+<section id="calendar">
+  <div class="section-title">📅 Feed the Days</div>
+  <div class="cal-summary">You've fed <b id="fedCount">0</b> days this month 🌸</div>
+  <div class="cal-grid" id="calGrid"></div>
+</section>
+
+<!-- LETTER WALL -->
+<section id="letters">
+  <div class="section-title">💌 Letter Wall</div>
+  <div class="letter-input-wrap">
+    <textarea id="letterInput" rows="3" maxlength="200" placeholder="Write something sweet... 🌷" oninput="updateCharCount()"></textarea>
+    <div class="letter-footer">
+      <span class="char-count" id="charCount">0 / 200</span>
+      <button class="btn-post" onclick="postLetter()">Post Letter 💌</button>
+    </div>
+  </div>
+  <div class="letters-list" id="lettersList"></div>
+</section>
+
+<footer>made with 💖 just for us · stay cozy always ✨</footer>
+
+<script>
+// ============================================================
+// MUSIC PLAYER
+// ============================================================
+const audio = document.getElementById('audioPlayer');
+const playBtn = document.getElementById('playBtn');
+audio.volume = 0.8;
+
+function togglePlay() {
+  if (audio.paused) {
+    audio.play().catch(()=>{});
+    playBtn.textContent = '⏸';
+  } else {
+    audio.pause();
+    playBtn.textContent = '▶';
+  }
+}
+
+function setVolume(v) {
+  audio.volume = parseFloat(v);
+}
+
+audio.addEventListener('ended', () => { playBtn.textContent = '▶'; });
+
+function loadLocalFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  audio.pause();
+  audio.src = url;
+  audio.load();
+  document.getElementById('trackName').textContent = '🎶 ' + file.name.replace(/\.[^/.]+$/, '');
+  playBtn.textContent = '▶';
+}
+
+// ============================================================
+// HEART GAME
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let score = 0;
+
+function resizeCanvas() {
+  const maxW = Math.min(700, canvas.parentElement.clientWidth - 10);
+  canvas.style.width = maxW + 'px';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const EMOJIS = ['💖','💗','💕','💞','💓','🩷','❤️'];
+const hearts = [];
+const NUM_HEARTS = 12;
+
+function randomBetween(a, b) { return Math.random() * (b - a) + a; }
+
+function spawnHeart(h) {
+  h.x = randomBetween(20, canvas.width - 20);
+  h.y = canvas.height + 20;
+  h.size = randomBetween(22, 38);
+  h.speed = randomBetween(0.8, 2.2);
+  h.emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+  h.wobble = randomBetween(0, Math.PI * 2);
+  h.wobbleSpeed = randomBetween(0.02, 0.05);
+  h.alive = true;
+}
+
+for (let i = 0; i < NUM_HEARTS; i++) {
+  const h = {};
+  spawnHeart(h);
+  h.y = randomBetween(-canvas.height, canvas.height); // stagger start
+  hearts.push(h);
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const h of hearts) {
+    if (!h.alive) continue;
+    h.y -= h.speed;
+    h.wobble += h.wobbleSpeed;
+    const wx = Math.sin(h.wobble) * 12;
+    if (h.y + h.size < 0) spawnHeart(h);
+    ctx.font = h.size + 'px serif';
+    ctx.globalAlpha = 0.92;
+    ctx.fillText(h.emoji, h.x + wx - h.size / 2, h.y);
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+  for (const h of hearts) {
+    if (!h.alive) continue;
+    const wx = Math.sin(h.wobble) * 12;
+    const dx = mx - (h.x + wx);
+    const dy = my - h.y;
+    if (Math.abs(dx) < h.size && Math.abs(dy) < h.size) {
+      score++;
+      document.getElementById('scoreDisplay').textContent = score;
+      spawnHeart(h);
+      waveMascot();
+      showFloatScore(e.clientX, e.clientY);
+      break;
+    }
+  }
+});
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const mx = (touch.clientX - rect.left) * scaleX;
+  const my = (touch.clientY - rect.top) * (canvas.height / rect.height);
+  for (const h of hearts) {
+    if (!h.alive) continue;
+    const wx = Math.sin(h.wobble) * 12;
+    const dx = mx - (h.x + wx);
+    const dy = my - h.y;
+    if (Math.abs(dx) < h.size * 1.5 && Math.abs(dy) < h.size * 1.5) {
+      score++;
+      document.getElementById('scoreDisplay').textContent = score;
+      spawnHeart(h);
+      waveMascot();
+      showFloatScore(touch.clientX, touch.clientY);
+      break;
+    }
+  }
+}, { passive: false });
+
+function showFloatScore(x, y) {
+  const el = document.createElement('div');
+  el.textContent = '+1 💕';
+  el.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-family:'Caveat',cursive;font-size:1.4rem;color:#e87070;pointer-events:none;z-index:999;font-weight:700;animation:floatUp 0.8s ease forwards;`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+// float up keyframe injected once
+const styleEl = document.createElement('style');
+styleEl.textContent = '@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}';
+document.head.appendChild(styleEl);
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function getCalKey(year, month, day) {
+  return `cal_${year}_${month}_${day}`;
+}
+
+function buildCalendar() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  dayNames.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-header'; h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  // empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day empty-cell';
+    grid.appendChild(cell);
+  }
+
+  let fedCount = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = getCalKey(year, month, d);
+    const fed = localStorage.getItem(key) === '1';
+    if (fed) fedCount++;
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (fed ? ' fed' : '') + (d === today ? ' today' : '');
+    cell.innerHTML = `<span class="day-num">${d}</span><span class="heart-icon">${fed ? '💖' : '🤍'}</span>`;
+    cell.addEventListener('click', () => toggleDay(year, month, d, daysInMonth));
+    grid.appendChild(cell);
+  }
+
+  document.getElementById('fedCount').textContent = fedCount;
+  checkAllFed(fedCount, daysInMonth);
+}
+
+function toggleDay(year, month, d, total) {
+  const key = getCalKey(year, month, d);
+  const current = localStorage.getItem(key) === '1';
+  localStorage.setItem(key, current ? '0' : '1');
+  buildCalendar();
+  waveMascot();
+}
+
+function checkAllFed(fed, total) {
+  if (fed === total) launchConfetti();
+}
+
+buildCalendar();
+
+// ============================================================
+// LETTER WALL
+// ============================================================
+function updateCharCount() {
+  const v = document.getElementById('letterInput').value.length;
+  document.getElementById('charCount').textContent = v + ' / 200';
+}
+
+function postLetter() {
+  const input = document.getElementById('letterInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const letters = JSON.parse(localStorage.getItem('letters') || '[]');
+  const now = new Date();
+  letters.unshift({
+    text,
+    date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  });
+  localStorage.setItem('letters', JSON.stringify(letters));
+  input.value = '';
+  updateCharCount();
+  renderLetters();
+  waveMascot();
+}
+
+function renderLetters() {
+  const letters = JSON.parse(localStorage.getItem('letters') || '[]');
+  const list = document.getElementById('lettersList');
+  list.innerHTML = '';
+  letters.forEach(l => {
+    const card = document.createElement('div');
+    card.className = 'letter-card';
+    card.innerHTML = `<div class="letter-meta">📅 ${l.date} · ⏰ ${l.time}</div><div class="letter-text">${escapeHtml(l.text)}</div>`;
+    list.appendChild(card);
+  });
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+renderLetters();
+
+// ============================================================
+// MASCOT
+// ============================================================
+function waveMascot() {
+  const m = document.getElementById('mascot');
+  m.classList.remove('wave');
+  void m.offsetWidth;
+  m.classList.add('wave');
+  setTimeout(() => m.classList.remove('wave'), 600);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function launchConfetti() {
+  const colors = ['#f9c5c5','#fdd9b5','#c8f0e0','#e8d5f5','#d0eeff','#f97070','#a8e6cf'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      const size = Math.random() * 10 + 6;
+      piece.style.width = size + 'px';
+      piece.style.height = size + 'px';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      const dur = 1.5 + Math.random() * 2;
+      piece.style.animationDuration = dur + 's';
+      piece.style.opacity = Math.random() * 0.6 + 0.4;
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), dur * 1000 + 100);
+    }, i * 20);
+  }
+}
+</script>
+</body>
+</html>
