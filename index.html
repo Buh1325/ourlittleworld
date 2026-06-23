@@ -484,24 +484,50 @@ async function loadLettersFromSupabase() {
 }
 
 // Toggle calendar day
-async function toggleDaySupabase(dateStr) {
+async function toggleDaySupabase(dateStr, cellEl) {
+  // Optimistic UI: flip immediately so it feels instant
+  const isCurrentlyFed = cellEl.classList.contains('fed');
+  const newFed = !isCurrentlyFed;
+
+  cellEl.classList.toggle('fed', newFed);
+  cellEl.querySelector('.heart-icon').textContent = newFed ? '💖' : '🤍';
+  document.getElementById('fedCount').textContent =
+    document.querySelectorAll('.cal-day.fed').length;
+
   try {
-    // First check if exists
-    const existing = await supabaseRequest(`calendar?date=eq.${dateStr}&select=fed`, 'GET');
-    const currentlyFed = existing.length > 0 ? existing[0].fed : false;
-    const newFed = !currentlyFed;
-    
-    if (existing.length > 0) {
-      await supabaseRequest(`calendar?date=eq.${dateStr}`, 'PATCH', { fed: newFed });
-    } else {
-      await supabaseRequest('calendar', 'POST', { date: dateStr, fed: newFed });
-    }
-    
-    await loadCalendarFromSupabase();
+    // Use upsert via POST with resolution header — works whether row exists or not
+    await supabaseRequestUpsert('calendar', { date: dateStr, fed: newFed });
     waveMascot();
   } catch (err) {
+    // Revert optimistic update on failure
+    cellEl.classList.toggle('fed', isCurrentlyFed);
+    cellEl.querySelector('.heart-icon').textContent = isCurrentlyFed ? '💖' : '🤍';
+    document.getElementById('fedCount').textContent =
+      document.querySelectorAll('.cal-day.fed').length;
     console.error('Toggle error:', err);
+    alert('Could not save: ' + err.message);
   }
+}
+
+// Separate upsert helper for calendar (needs different Prefer header)
+async function supabaseRequestUpsert(table, body) {
+  const url = `${SUPABASE_URL}/rest/v1/${table}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=representation'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Supabase error: ${response.status} - ${error}`);
+  }
+  const text = await response.text();
+  return text ? JSON.parse(text) : [];
 }
 
 // Load calendar
@@ -561,7 +587,7 @@ function renderCalendarDirect(year, month, fedDays, daysInMonth) {
     const cell = document.createElement('div');
     cell.className = 'cal-day' + (fed ? ' fed' : '') + (isToday ? ' today' : '');
     cell.innerHTML = `<span class="day-num">${d}</span><span class="heart-icon">${fed ? '💖' : '🤍'}</span>`;
-    cell.addEventListener('click', () => toggleDaySupabase(dateStr));
+    cell.addEventListener('click', () => toggleDaySupabase(dateStr, cell));
     grid.appendChild(cell);
   }
   
