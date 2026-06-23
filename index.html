@@ -440,6 +440,17 @@ async function supabaseRequest(endpoint, method, body) {
   return text ? JSON.parse(text) : [];
 }
 
+function updateCharCount() {
+  const v = document.getElementById('letterInput')?.value.length || 0;
+  const counter = document.getElementById('charCount');
+  if (counter) counter.textContent = v + ' / 200';
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // Post a letter
 async function postLetter() {
   const input = document.getElementById('letterInput');
